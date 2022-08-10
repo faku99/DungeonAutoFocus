@@ -1,0 +1,7 @@
+## Interface: 90205
+## Title: DungeonAutoFocus
+## Notes: Auto-focus tank in dungeons.
+## Author: faku99
+## Version: 0.0.1
+
+core.lua

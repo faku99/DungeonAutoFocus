@@ -1,0 +1,20 @@
+{
+    "Lua.completion.showParams": true,
+    "Lua.diagnostics.globals": [
+        "SlashCmdList",
+        "GeneralDockManager",
+        "DEFAULT_CHAT_FRAME",
+        "StaticPopupDialogs",
+        "StaticPopup_Show",
+        "GameFontNormal",
+        "GameFontDisable",
+        "GameFontHighlight",
+        "StaticPopup_Hide"
+    ],
+    "Lua.runtime.version": "Lua 5.1",
+
+    "wowAPI.emmyLua.loadFrameXML": true,
+    "Lua.diagnostics.disable": [
+        "undefined-field"
+    ]
+}
