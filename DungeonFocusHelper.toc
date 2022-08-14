@@ -1,0 +1,14 @@
+## Interface: 90205
+## Title: DungeonFocusHelper
+## Notes: Helps you focusing tank when entering a dungeon.
+## Author: faku99
+## Version: 1.0.0
+
+# Libraries
+libs\libs.xml
+
+# Locales
+locales\locales.xml
+
+# Addon files
+core.lua

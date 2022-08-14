@@ -7,14 +7,17 @@ local LISTENER_NAME = ADDON .. 'Listener';
 local listener = CreateFrame('Frame', LISTENER_NAME);
 listener:RegisterEvent("PLAYER_ENTERING_WORLD");
 
+-- Localization
+local L = LibStub('AceLocale-3.0'):GetLocale('DungeonFocusHelper');
+
 -- This dialog will show up when entering an instance with a group of 2-5 people.
 StaticPopupDialogs[DIALOG_NAME] = {
-    text = 'Do you want to focus %s-%s?',
-    button1 = 'Yes',
-    button2 = 'No',
+    text = L['WANT_FOCUS'],
+    button1 = L['YES'],
+    button2 = L['NO'],
     OnShow = function(self)
         -- Retrieve tank name from argument
-        local unit = self.text.text_arg1;
+        local unit = self.text.text_arg2;
 
         -- Create SecureAction button and set same cosmetics as StaticPopupButtonTemplate
         self.secureButton = CreateFrame('Button', BUTTON_NAME, self, 'SecureActionButtonTemplate');
@@ -56,12 +59,11 @@ hooksecurefunc('SecureActionButton_OnClick',
 
 -- Addon's general printing function.
 function Addon:Print(message)
-    print(ADDON .. ' - ' .. message);
+    print('|cFFF28C28' .. ADDON .. ' -|r ' .. message);
 end
 
--- Addon's general warning printing function.
-function Addon:PrintWarning(message)
-    Addon:Print('|cFFFF00FFWARNING:|r ' .. message);
+function Addon:Debug(message)
+    Addon:Print('|cFFFFFF00DEBUG:|r ' .. message);
 end
 
 local function getPlayerName(unit)
@@ -71,7 +73,7 @@ local function getPlayerName(unit)
         realm = GetRealmName();
     end
 
-    return name, realm;
+    return name .. '-' .. realm;
 end
 
 local function onEvent(self, event, ...)
@@ -79,6 +81,12 @@ local function onEvent(self, event, ...)
         local _, instanceType, _ = GetInstanceInfo();
 
         if (instanceType == 'party') then
+            Addon:Print(L['ADDON_LOADED']);
+
+            -- TODO: When in combat, don't show the popup. Instead, wait for the combat to be over, and then show the
+            -- popup.
+            -- Addon:Debug('UnitAffectingCombat: ' .. tostring(UnitAffectingCombat('player')));
+
             local numGroupMembers = GetNumGroupMembers();
             if (numGroupMembers > 0) then
                 local tankFound = false;
@@ -86,20 +94,24 @@ local function onEvent(self, event, ...)
                 for i = 1, numGroupMembers - 1 do
                     local unit = 'party' .. i;
                     local role = UnitGroupRolesAssigned(unit);
-                    local name, realm = getPlayerName(unit);
+                    local name = getPlayerName(unit);
 
                     if (role == 'TANK') then
                         tankFound = true;
-                        if (UnitName('focus') == 'none') then
-                            StaticPopup_Show(DIALOG_NAME, name, realm);
+                        local focused = UnitName('focus');
+                        if (focused == nil) then
+                            StaticPopup_Show(DIALOG_NAME, name, unit);
                         else
-                            Addon:PrintWarning('Already focusing ' .. UnitName('focus'));
+                            Addon:Debug('focused: ' .. focused);
+                            if ((focused ~= tankFound) or (focused ~= unit)) then
+                                Addon:Print(string.format(L['ALREADY_FOCUSING'], UnitName('focus')));
+                            end
                         end
                     end
                 end
 
                 if (tankFound == false) then
-                    Addon:PrintWarning('No tank found!');
+                    Addon:Print(L['NO_TANK_FOUND']);
                 end
             end
         end
